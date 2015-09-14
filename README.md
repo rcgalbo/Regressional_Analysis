@@ -1,16 +1,12 @@
 # STAT 308: Applied Regressional Analysis
------------------------
+=========================================
 ##Statistics Department 
-
 ##Loyola University Chicago - Fall 2015
 
 ##Instructor
------------------------
-
 Molly Walsh
 
 ## Course ObJectives
-------------------------
 
 This course provides students with a thorough introduction to applied regression methodology. The concept of simple
 linear regression will be reviewed, and multiple linear regression, transformations, indicator variables,
@@ -20,6 +16,4 @@ biostatistics (clinical trials, HIV studies, etc.), sports, engineering, busines
 Students are required to analyze real-life datasets using output from statistical packages such as Minitab, SAS and R
 
 ##Textbook
-----------------------------
-
 Mendenhall and Sincich, A Second Course in Statistics: Regression Analysis, 7th Ed., Pearson, 2012.
