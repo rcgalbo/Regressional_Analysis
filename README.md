@@ -1,7 +1,7 @@
 STAT 308: Applied Regressional Analysis
 =========================================
-##Statistics Department 
-##Loyola University Chicago - Fall 2015
+###Statistics Department 
+###Loyola University Chicago - Fall 2015
 
 ##Instructor
 Molly Walsh
