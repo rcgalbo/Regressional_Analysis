@@ -1,4 +1,4 @@
-# STAT 308: Applied Regressional Analysis
+STAT 308: Applied Regressional Analysis
 =========================================
 ##Statistics Department 
 ##Loyola University Chicago - Fall 2015
