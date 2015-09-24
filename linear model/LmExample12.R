@@ -1,8 +1,21 @@
 #example 1.2 
 
-geese <- "SNOWGEESE.txt"
-GEESE <- read.table(geese, header = TRUE)
+firedam <- "FIREDAM.txt"
+FIREDAM <- read.table(firedam, header = TRUE)
 
-plot(GEESE$WtChange,GEESE$DigEff, xlab = 'Digestion Efficancy', ylab = 'Weight Change', main = 'Scatter and Regression of Geese and Digestion Efficiency')
+#plot the data
+plot(FIREDAM$DISTANCE,FIREDAM$DAMAGE, xlab = 'Distance from Firehouse', ylab = 'Damage Caused', main = 'Scatter and Regression of Geese and Digestion Efficiency')
+#include the least squares regression
+abline(lm(DAMAGE~DISTANCE, data = FIREDAM))
 
-abline(lm(GEESE$WtChange~GEESE$DigEff))
+#create the linear model
+linearmodel <- lm(DAMAGE~DISTANCE, data = FIREDAM)
+#get an analysis of variance and a summary of the variables
+anova(linearmodel)
+summary(linearmodel)
+
+#give predictions
+predict.lm(linearmodel, level= 0.95, interval = "predict", se.fit = TRUE)
+
+#obtain the residules
+resid(linearmodel)
