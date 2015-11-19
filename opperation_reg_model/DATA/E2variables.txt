@@ -1,0 +1,12 @@
+A medical researcher is interested in predicting survival (in days) in patients undergoing a particular type of operation. A random selection of 54 patients was available for analysis. The following information was available for each patient.
+
+X1: Blood clotting score
+X2: Prognostic index
+X3: Enzyme function test score
+X4: Liver function test score
+X5: Age in years
+X6: Number of years employed
+X7: Gender (0 = male, 1 = female)
+X8: Moderate alcohol use (1 = yes, 0 = no) 
+X9: Severe alcohol use (1 = yes, 0 = no)
+ Y: Survival (days)
