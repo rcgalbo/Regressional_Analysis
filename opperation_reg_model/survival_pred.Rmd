@@ -1,0 +1,186 @@
+--- 
+title: "Test2 - Survival Prediction Model"
+author: "Rick Galbo"
+date: "November 20, 2015"
+output: pdf_document
+---
+
+##Abstract
+
+This research is to determine a proper model for predicting the rates of survival among patients who underwent this medical procedure. In order to predict the length of post-op patient’s survival, we employ statistical methods to select from eight predictor variables and build the best predictive model from these. The independent variables are blood clotting score, prognostic index, enzyme function test score, Liver function test score, age, number of years employed, gender and alcohol use.
+
+\newpage
+
+##Intro
+
+To build a statistically significant model for survival length of post-op patients, we will identify the most predictive variables which will be combined to produce a model to best describe our data.
+
+##Methodology
+
+###Dependent and Independent Variable Relationships
+
+The first step Was to review the individual numerical and categorical variables to determine their statistical significance. Here are the scatter plots for the numerical variables with the underlying linear model overlay:
+
+```{r, echo=FALSE}
+
+file <- "C:\\Users\\Rick\\Documents\\STAT308\\Regressional_Analysis\\opperation_reg_model\\DATA\\EXAM2DATA.txt"
+BLOOD <- read.table(file, header = TRUE)
+
+par(mfrow=c(3,2),mar=c(5,4,2,2))
+plot(BLOOD$Y~BLOOD$X1, main='X1')
+abline(lm(BLOOD$Y~BLOOD$X1), col = "red")
+plot(BLOOD$Y~BLOOD$X2,main='X2')
+abline(lm(BLOOD$Y~BLOOD$X2), col = "red")
+plot(BLOOD$Y~BLOOD$X3,main='X3')
+abline(lm(BLOOD$Y~BLOOD$X3), col = "red")
+plot(BLOOD$Y~BLOOD$X4,main='X4')
+abline(lm(BLOOD$Y~BLOOD$X4), col = "red")
+plot(BLOOD$Y~BLOOD$X5,main='X5')
+abline(lm(BLOOD$Y~BLOOD$X5), col = "red")
+plot(BLOOD$Y~BLOOD$X6,main='X6')
+abline(lm(BLOOD$Y~BLOOD$X6), col = "red")
+
+```
+
+###Full Model
+
+We can see that the first four variables have decent predictability while the last two show little to no relation. Next we created linear models for the categorical variables to check their predictability.
+
+```{r, echo=FALSE}
+#creating full multi lin model
+MLinMod <- lm(Y~X1+X2+X3+X4+X5+X6+X7+X8+X9, data = BLOOD)
+summary(MLinMod)
+```
+
+###Influential Values
+
+Using the Cook's D statistic we will identify influential points. These points will apear to be outlierswhen the Cook's D statistic is plotted. We do identify one significantly influential poin after plotting Cook's D here:
+
+```{r, echo=FALSE}
+model <- lm(Y ~ X1+X2+X3+X4+X5+X6+X7+X8+X9, data = BLOOD)
+plot(cooks.distance(model))
+```
+
+###Checking for Outliers
+
+It is important after discovering an influential value to check if it is considered an outlier. This value may be affecting the accuracy of the model that has been built thus far. Upon inspection of the graphical output from the previous graph as well ass the one dimentional scatter plots which are created using the package 'mvoutliers', we can see that there are indeed a few extreme values present in the data. We will test the improvement of the model with that extreme value excluded.
+
+```{r, echo=FALSE}
+
+#checking model with first largest outlier removed
+MLinMod_NoOut <- lm(Y~X1+X2+X3+X4+X5+X6+X7+X8+X9, data = BLOOD[-c(5),])
+summary(MLinMod_NoOut)
+par(mfrow=c(2,2))
+plot(MLinMod_NoOut)
+
+
+BLOOD <- BLOOD[-5,]
+```
+
+With the removal of the largest outlier we see a great improvement in the fit statistics of the model before the predictor variables have even been screened.
+
+\newpage
+
+###Checking for Multicollinearity
+With all of the variables included in this initial model it is important to check for multicollinearity. Using the package 'corrplot' we are able to create a graphical correlation matrix to visually identify highly correlated pairs of predictor variables.
+
+```{r, echo=FALSE}
+M <- cor(BLOOD[,1:9]) # get correlations
+library('corrplot') #package corrplot
+corrplot(M, method = "circle") #plot matrix
+```
+
+As we would expect the variables X5: Age and X6: Years employed are very highly correlated. The variable X4 is also considerably correlated to X1, X2 and X3. Removing the two variables X6 and X4 we get a new model:
+
+```{r, echo=FALSE}
+#creating a model minus the highly correlated terms
+MLinMod.lesscorr <- lm(Y~X1+X2+X3+X5+X7+X8+X9, data = BLOOD)
+summary(MLinMod.lesscorr)
+```
+
+Without the inclusion of the highly correlated terms we can see that the adjusted R-squared value has went up, meaning that the model better explains the variance of the independent variable. To see if we have built the model that gives the highest adjusted R-Squared value, a good method to use is a step wise regression. This will build the best first-order model out of our given predictor variables. Just to make sure that nothing was missed when removing the correlated variables, they have been included in the pool of choices for the step wise.
+
+###R-Squared and Mallow CP
+
+A way to evaluate the number of predictor variables used in a first order linear model is to look at the R-Squared and the Mallow CP statistic as functions of the number of predictor variables included in the model. 
+
+```{r,echo=FALSE}
+library(leaps)
+regsubsets.out <-
+  regsubsets(Y~X1+X2+X3+X4+X5+X6+X7+X8+X9, 
+             data = BLOOD,
+             nbest = 1,
+             nvmax = NULL,
+             force.in = NULL, force.out = NULL,
+             method = "exhaustive")
+
+summary.out <- summary(regsubsets.out)
+
+library(car)
+par(mfrow=c(1,2), cex = 0.5)
+res.legend <-  subsets(regsubsets.out, statistic="adjr2", legend = FALSE, min.size = 5, main = "Adjusted R^2")
+res.legend <-  subsets(regsubsets.out, statistic="cp", legend = FALSE, min.size = 5, main = "Mallow Cp")
+abline(a = 1, b = 1, lty = 2)
+
+```
+
+We can see that the model containing six variables yeilds the maximum R-Squared value while still maintaining a relatively small Mallow CP value. A Mallow CP value small and close to the number of variables in the model is indicative of a precise model.
+
+\newpage
+
+###Stepwise Regression
+
+The best first order model that was chosen by the step wise regression consists of the variables X4: Liver function test score, X9: Severe alcohol use (1 = yes, 0 = no), X1: Blood clotting score, X2: Prognostic index and X3: Enzyme function test score. the summary from this model is given here:
+
+```{r, echo=FALSE}
+
+best <- lm(Y ~ X4 + X3 + X2 + X9 + X1 + X7, data = BLOOD)
+summary(best)
+
+```
+
+
+This model has a higher adjusted R-squared value than the previous model and does show good fit.
+
+\newpage
+
+###Residule Analysis
+
+Now lets take a look at the residual plot of the last model that was selected by the step wise regression:
+
+```{r, echo=FALSE}
+par(mfrow=c(2,2))
+plot(best)
+```
+
+
+Although the probability plot looks good for this model there is a clear bias in the residue plot. Using a higher order term created by multiplying the two most significant variables, we now create a new model to account for this bias in the data.
+
+
+```{r, echo=FALSE}
+#including an interaction term
+interaction <- lm(Y ~ X4 + X3 + X2 + X9 + X1 + X7 + X3*X4, data = BLOOD)
+summary(interaction)
+par(mfrow=c(2,2))
+plot(interaction)
+```
+
+
+No only has the adjusted R-squared went up again but the residual plot looks much better, however it still is not perfect and does appear to exhibit some multiplicative error. To remedy this we will use a logarithmic transformation of the dependent variable. This is the proper transformation for dealing with multiplicative error.
+
+
+```{r, echo=FALSE}
+sord <- lm(log(Y) ~  X4 + X3 + X2 + X9 + X1 + X7 + X3*X4, data = BLOOD)
+summary(sord)
+par(mfrow=c(2,2))
+plot(sord)
+```
+
+
+The model's residual graph now shows no signs of bias and looks relatively homoscedastic. The adjusted R-squared value has also went up once more and explains eighty one percent of the variance of the dependent variable.
+
+##Conclusion
+
+After testing multiple models, a fairly complex model utilizing a logarithmic transformation of the dependent variable and a second order interaction term were determined to create the best fitting model for predicting the survival length of post operation patients. Using this model we can account for eighty percent of the variance in the survival rates of the post opperative patients.
+
+
